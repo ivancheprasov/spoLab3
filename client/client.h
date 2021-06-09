@@ -20,4 +20,5 @@ void free_client(client *ptr);
 
 void receive_message(message *msg, int32_t server_fd);
 
+uint16_t get_history(message **buffer, uint16_t buffer_size, int32_t server_fd);
 #endif //SPOLAB3_CLIENT_H

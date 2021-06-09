@@ -11,8 +11,8 @@ int8_t sign_in(char *client_name, int32_t server_fd) {
 }
 
 uint16_t get_history(message **buffer, uint16_t buffer_size, int32_t server_fd) {
-    uint16_t size;
-    recv(server_fd, &size, sizeof (size), MSG_NOSIGNAL);
+    uint16_t size = 0;
+    recv(server_fd, &size, sizeof(size), MSG_NOSIGNAL);
     for (uint16_t i = 0; i < size; ++i) {
         message *msg = malloc(sizeof(message));
         receive_message(msg, server_fd);
