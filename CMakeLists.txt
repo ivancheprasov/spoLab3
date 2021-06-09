@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.19)
+project(spoLab3 C)
+
+set(CMAKE_C_STANDARD 99)
+find_package(Threads REQUIRED)
+find_package(Curses REQUIRED)
+add_executable(client server/server.c server/server.h utils/linked_list.c utils/linked_list.h client/client.c client/client.h utils/message.c utils/message.h utils/const.h client/client_main.c client/ui.c client/ui.h)
+add_executable(server server/server.c server/server.h utils/linked_list.c utils/linked_list.h client/client.c client/client.h utils/message.c utils/message.h utils/const.h server/server_main.c)
+target_link_libraries(server ${CURSES_LIBRARIES})
+target_link_libraries(server Threads::Threads)
+target_link_libraries(client ${CURSES_LIBRARIES})
+target_link_libraries(client Threads::Threads)
