@@ -5,7 +5,7 @@
 #include "../utils/message.h"
 #include "../utils/linked_list.h"
 #include "../client/client.h"
-#include "../utils/ui_list.h"
+#include "../utils/ui/ui_list.h"
 #include "server_ui.h"
 
 struct server_info {

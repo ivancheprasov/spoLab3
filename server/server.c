@@ -42,8 +42,12 @@ void handle_request(message *ptr, server_info *server) {
                 current = current->next;
             }
         } else {
-            client *found = find_element(by_username, server->clients, ptr->to);
-            send_msg(found, ptr);
+            client *receiver = find_element(by_username, server->clients, ptr->to);
+            if (receiver != NULL) {
+                send_msg(receiver, ptr);
+            }
+            client *sender = find_element(by_username, server->clients, ptr->from);
+            send_msg(sender, ptr);
         }
     }
 }
@@ -67,9 +71,13 @@ void work_with_client(
     } while (text_size != 0);
 }
 
+bool filter_values(void*value, char* to_filter) {
+    return to_message(value)->to_size == 0 || strcmp(to_message(value)->to, to_filter) == 0 ;
+}
+
 void send_history(server_info *server, client *client) {
     message *buffer[HISTORY_BUFFER_SIZE];
-    uint16_t size = get_last_n(server->history, (void **) buffer, HISTORY_BUFFER_SIZE);
+    uint16_t size = get_last_n(server->history, (void **) buffer, HISTORY_BUFFER_SIZE, filter_values, client->client_name);
     send(client->fd, &size, sizeof(size), MSG_NOSIGNAL);
     for (uint16_t i = 0; i < size; ++i) {
         send_msg(client, buffer[i]);

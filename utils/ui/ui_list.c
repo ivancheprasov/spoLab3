@@ -1,7 +1,7 @@
 #include <memory.h>
 #include <malloc.h>
 #include "ui_list.h"
-#include "message.h"
+#include "../message.h"
 
 void redraw(ui_list *list, linked_list *messages) {
     wclear(list->window);
@@ -10,7 +10,7 @@ void redraw(ui_list *list, linked_list *messages) {
             uint16_t buffer_size = getmaxy(list->window);
             message *buffer[buffer_size];
             memset(buffer, 0, sizeof(message *) * buffer_size);
-            get_last_n(messages, (void **) buffer, buffer_size);
+            get_last_n(messages, (void **) buffer, buffer_size, NULL, NULL);
             for (int16_t i = buffer_size - 1; i >= 0; --i) {
                 char line_buffer[getmaxx(list->window)];
                 memset(line_buffer, 0, getmaxx(list->window));
@@ -91,25 +91,21 @@ void handle_down(ui_list *list, linked_list *messages) {
 }
 
 void handle_home(ui_list *list, linked_list *messages) {
-    list->is_tracking = false;
-    list->first_index = 0;
     if (messages->size > getmaxy(list->window)) {
+        list->is_tracking = false;
+        list->first_index = 0;
         list->last_index = getmaxy(list->window);
-    } else {
-        list->last_index = messages->size;
+        redraw(list, messages);
     }
-    redraw(list, messages);
 }
 
 void handle_end(ui_list *list, linked_list *messages) {
-    list->is_tracking = true;
-    list->last_index = messages->size;
     if (messages->size > getmaxy(list->window)) {
+        list->is_tracking = true;
+        list->last_index = messages->size;
         list->first_index = messages->size - getmaxy(list->window);
-    } else {
-        list->first_index = 0;
+        redraw(list, messages);
     }
-    redraw(list, messages);
 }
 
 ui_list *create_list(WINDOW *window) {

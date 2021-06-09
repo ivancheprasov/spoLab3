@@ -17,6 +17,9 @@ int main(int argc, char **argv) {
     UI *ui = init_ui();
     server_info *info_ptr = startup(port, tracking_redraw, ui);
 
+    if (info_ptr == NULL) {
+        return -1;
+    }
     int cur = getch();
     while (cur != 'q') {
         char command[500] = {0};

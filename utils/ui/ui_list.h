@@ -2,7 +2,7 @@
 #define SPOLAB3_UI_LIST_H
 
 #include <curses.h>
-#include "linked_list.h"
+#include "../linked_list.h"
 
 typedef struct {
     WINDOW *window;

@@ -60,12 +60,19 @@ void remove_element(bool (*by)(void *, char *), linked_list *ptr, char *to_find)
         current = current->next;
     }
     if (current != NULL) {
+        if (ptr->first == current) {
+            ptr->first = current->next;
+        }
+        if (ptr->last == current) {
+            ptr->last = current->prev;
+        }
         if (current->prev != NULL) {
             current->prev->next = current->next;
         }
         if (current->next != NULL) {
             current->next->prev = current->prev;
         }
+        ptr->size--;
         free(current);
     }
 }
@@ -78,14 +85,19 @@ void *find_element(bool (*by)(void *, char *), linked_list *ptr, char *to_find) 
     while (current != NULL && !by(current->value, to_find)) {
         current = current->next;
     }
-    return current;
+    if (current == NULL) return NULL;
+    return current->value;
 }
 
-uint16_t get_last_n(linked_list *ptr, void **buffer, uint16_t buffer_size) {
+uint16_t get_last_n(linked_list *ptr, void **buffer, uint16_t buffer_size, bool(*filter)(void *, char*to_filter), char*to_filter) {
     node *current = ptr->last;
     for (uint16_t i = 0; i < buffer_size; ++i) {
-        if(current == NULL) return i;
-        buffer[i] = current->value;
+        if (current == NULL) return i;
+        if (filter == NULL || filter(current->value, to_filter)) {
+            buffer[i] = current->value;
+        } else {
+            --i;
+        }
         current = current->prev;
     }
     return buffer_size;

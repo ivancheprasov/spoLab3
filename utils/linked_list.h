@@ -34,6 +34,6 @@ void free_list(linked_list *ptr);
 
 void remove_element(bool (*by)(void *, char *), linked_list *ptr, char *to_find);
 
-uint16_t get_last_n(linked_list *ptr, void **buffer, uint16_t buffer_size);
+uint16_t get_last_n(linked_list *ptr, void **buffer, uint16_t buffer_size, bool(*filter)(void*, char*to_filter), char*to_filter);
 
 #endif //SPOLAB3_LINKED_LIST_H
