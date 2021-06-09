@@ -41,16 +41,18 @@ uint16_t deserialize(message *to_fill, char src[MAX_MESSAGE_STRUCT_SIZE]) {
     }
 }
 
-void *log_message(message *message) {
-    uint16_t log_size = DATE_STRING_SIZE+USERNAME_SIZE+3+message->text_size;
-    char buffer [log_size];
-    char date_str[DATE_STRING_SIZE] = {0};
-    strftime(date_str, DATE_STRING_SIZE, "[%d.%m.%Y %X]", localtime(&message->time));
-    char name_formatted[USERNAME_SIZE] = {0};
-    memcpy(name_formatted, message->from, message->from_size);
-    for (uint8_t i = message->from_size; i < USERNAME_SIZE - 1; ++i) {
-        name_formatted[i] = ' ';
+void log_message(message *message) {
+    if (message != NULL && message->text_size != 0) {
+        uint16_t log_size = DATE_STRING_SIZE + USERNAME_SIZE + 3 + message->text_size;
+        char buffer[log_size];
+        char date_str[DATE_STRING_SIZE] = {0};
+        strftime(date_str, DATE_STRING_SIZE, "[%d.%m.%Y %X]", localtime(&message->time));
+        char name_formatted[USERNAME_SIZE] = {0};
+        memcpy(name_formatted, message->from, message->from_size);
+        for (uint8_t i = message->from_size; i < USERNAME_SIZE - 1; ++i) {
+            name_formatted[i] = ' ';
+        }
+        sprintf(buffer, "%s %s- %s\n", date_str, name_formatted, message->text);
+        write(1, buffer, strlen(buffer));
     }
-    sprintf(buffer, "%s %s- %s\n", date_str, name_formatted, message->text);
-    write(1, buffer, strlen(buffer));
 }

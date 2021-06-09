@@ -1,6 +1,7 @@
 #include <stddef.h>
 #include <malloc.h>
 #include "linked_list.h"
+#include "message.h"
 
 void *get_element(linked_list *ptr, uint32_t index) {
     if (index >= ptr->size) {
@@ -91,6 +92,7 @@ uint16_t get_last_n(linked_list *ptr, void **buffer, uint16_t buffer_size) {
     node *current = ptr->last;
     for (uint16_t i = 0; i < buffer_size; ++i) {
         if(current == NULL) return i;
+        message*msg = current->value;
         buffer[i] = current->value;
         current = current->prev;
     }

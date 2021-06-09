@@ -13,12 +13,11 @@ struct server_info {
     linked_list *history;
     pthread_t manager_t_id;
     pthread_mutex_t mutex;
-    void (*handler)(message *ptr, struct server_info *server);
 };
 
 typedef struct server_info server_info;
 
-server_info *startup(uint16_t port, void (*handler)(message *, server_info *));
+server_info *startup(uint16_t port);
 
 void close_server(server_info *info);
 

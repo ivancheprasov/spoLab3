@@ -13,10 +13,9 @@ struct accept_client_arg {
 
 };
 
-server_info *create_server_info(uint16_t port, void (*handler)(message *, server_info *)) {
+server_info *create_server_info(uint16_t port) {
     server_info *server = malloc(sizeof(server_info));
     server->port = port;
-    server->handler = handler;
     server->clients = init_list();
     server->history = init_list();
     return server;
@@ -32,42 +31,46 @@ void send_msg(client *found, message *msg) {
 }
 
 void handle_request(message *ptr, server_info *server) {
-    log_message(ptr);
-    add_last(server->history, ptr);
-    if (ptr->to_size == 0) {
-        node *current = server->clients->first;
-        while (current != NULL) {
-            send_msg(current->value, ptr);
-            current = current->next;
+    if (ptr->text_size != 0) {
+        ptr->time = time(NULL);
+        log_message(ptr);
+        add_last(server->history, ptr);
+        if (ptr->to_size == 0) {
+            node *current = server->clients->first;
+            while (current != NULL) {
+                send_msg(current->value, ptr);
+                current = current->next;
+            }
+        } else {
+            client *found = find_element(by_username, server->clients, ptr->to);
+            send_msg(found, ptr);
         }
-    } else {
-        client *found = find_element(by_username, server->clients, ptr->to);
-        send_msg(found, ptr);
     }
 }
 
 void work_with_client(
         int32_t client_socket,
-        server_info *ptr,
-        void (*handler)(message *, server_info *)
+        server_info *ptr
 ) {
     uint16_t msg_size;
+    uint16_t text_size;
     recv(client_socket, &msg_size, sizeof(msg_size), MSG_NOSIGNAL);
     do {
         char buf[MAX_MESSAGE_STRUCT_SIZE];
         memset(buf, 0, MAX_MESSAGE_STRUCT_SIZE);
-        message msg;
         recv(client_socket, buf, msg_size, MSG_NOSIGNAL);
-        deserialize(&msg, buf);
-        handler(&msg, ptr);
+        message *msg = malloc(sizeof(message));
+        deserialize(msg, buf);
+        text_size = msg->text_size;
+        handle_request(msg, ptr);
         recv(client_socket, &msg_size, sizeof(msg_size), MSG_NOSIGNAL);
-    } while (msg_size != 0);
+    } while (text_size != 0);
 }
 
 void send_history(server_info *server, client *client) {
-    message *buffer [HISTORY_BUFFER_SIZE];
+    message *buffer[HISTORY_BUFFER_SIZE];
     uint16_t size = get_last_n(server->history, (void **) buffer, HISTORY_BUFFER_SIZE);
-    send(client->fd, &size, sizeof (size), MSG_NOSIGNAL);
+    send(client->fd, &size, sizeof(size), MSG_NOSIGNAL);
     for (uint16_t i = 0; i < size; ++i) {
         send_msg(client, buffer[i]);
     }
@@ -75,7 +78,7 @@ void send_history(server_info *server, client *client) {
 
 void accept_client(struct accept_client_arg *arg) {
     send_history(arg->server, arg->client_info);
-    work_with_client(arg->client_info->fd, arg->server, arg->server->handler);
+    work_with_client(arg->client_info->fd, arg->server);
     handle_sign_out(arg->server, arg->client_info);
 }
 
@@ -91,7 +94,7 @@ _Noreturn void manage_connections(server_info *info) {
             struct accept_client_arg *arg = malloc(sizeof(struct accept_client_arg));
             arg->server = info;
             arg->client_info = created;
-            char log_buffer [USERNAME_SIZE+11];
+            char log_buffer[USERNAME_SIZE + 11];
             sprintf(log_buffer, "%s logged in\n", username);
             write(1, log_buffer, strlen(log_buffer));
             pthread_create(&arg->client_info->thread, NULL, (void *(*)(void *)) accept_client, arg);
@@ -99,8 +102,8 @@ _Noreturn void manage_connections(server_info *info) {
     }
 }
 
-server_info *startup(uint16_t port, void (*handler)(message *, server_info *)) {
-    server_info *server_info_ptr = create_server_info(port, handler);
+server_info *startup(uint16_t port) {
+    server_info *server_info_ptr = create_server_info(port);
     int created_socket = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in address;
     address.sin_addr.s_addr = htonl(INADDR_ANY);

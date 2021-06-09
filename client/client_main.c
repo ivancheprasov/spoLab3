@@ -47,8 +47,8 @@ int main(int argc, char **argv) {
     sign_in(argv[2], server_fd);
     message *buffer[HISTORY_BUFFER_SIZE] = {0};
     uint16_t history_size = get_history(buffer, HISTORY_BUFFER_SIZE, server_fd);
-    for (int i = 0; i < history_size; ++i) {
-        log_message(buffer[history_size]);
+    for (int i = history_size - 1; i >= 0; --i) {
+        log_message(buffer[i]);
     }
     pthread_t notification_thread;
     arg a;
@@ -64,11 +64,12 @@ int main(int argc, char **argv) {
         strcpy(msg->from, argv[2]);
         strcpy(msg->text, input);
         msg->from_size = strlen(argv[2]);
+        msg->to_size = 0;
         msg->text_size = strlen(input);
-        msg->time = time(NULL);
+//        msg->time = time(NULL);
         uint16_t size = serialize(msg, to_send);
         send(server_fd, &size, sizeof(size), MSG_NOSIGNAL);
         send(server_fd, to_send, size, MSG_NOSIGNAL);
-    } while (strcmp(input, "quit") != 0);
+    } while (strlen(input) != 0);
 
 }

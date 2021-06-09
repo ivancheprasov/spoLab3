@@ -19,6 +19,6 @@ uint16_t serialize(message *src, char to_fill[MAX_MESSAGE_STRUCT_SIZE]);
 
 uint16_t deserialize(message *to_fill, char src[MAX_MESSAGE_STRUCT_SIZE]);
 
-void *log_message(message *message);
+void log_message(message *message);
 
 #endif //SPOLAB3_MESSAGE_H
