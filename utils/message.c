@@ -1,7 +1,3 @@
-//
-// Created by subhuman on 6/7/21.
-//
-
 #include <memory.h>
 #include <malloc.h>
 #include <unistd.h>
@@ -29,8 +25,10 @@ uint16_t deserialize(message *to_fill, char src[MAX_MESSAGE_STRUCT_SIZE]) {
         uint16_t size = 12;
         memcpy(to_fill->from, src + size, to_fill->from_size);
         size += to_fill->from_size;
+        to_fill->from[to_fill->from_size] = '\0';
         memcpy(to_fill->to, src + size, to_fill->to_size);
         size += to_fill->to_size;
+        to_fill->to[to_fill->to_size] = '\0';
         to_fill->text = malloc(to_fill->text_size);
         memcpy(to_fill->text, src + size, to_fill->text_size);
         to_fill->text[to_fill->text_size] = '\0';
@@ -55,4 +53,8 @@ void log_message(message *message) {
         sprintf(buffer, "%s %s- %s\n", date_str, name_formatted, message->text);
         write(1, buffer, strlen(buffer));
     }
+}
+
+message *to_message(void *value) {
+    return (message *) value;
 }

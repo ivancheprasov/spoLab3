@@ -17,8 +17,6 @@ typedef struct {
     struct node *last;
     uint32_t size;
 
-    bool (*validation_fun)(void *value);
-
     void (*free_value_fun)(void *value);
 } linked_list;
 

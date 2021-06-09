@@ -10,7 +10,7 @@ int8_t sign_in(char *client_name, int32_t server_fd) {
     return (int8_t) response;
 }
 
-uint16_t get_history(message **buffer, uint16_t buffer_size, int32_t server_fd) {
+uint16_t get_history(message **buffer, int32_t server_fd) {
     uint16_t size = 0;
     recv(server_fd, &size, sizeof(size), MSG_NOSIGNAL);
     for (uint16_t i = 0; i < size; ++i) {

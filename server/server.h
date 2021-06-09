@@ -5,6 +5,8 @@
 #include "../utils/message.h"
 #include "../utils/linked_list.h"
 #include "../client/client.h"
+#include "../utils/ui_list.h"
+#include "server_ui.h"
 
 struct server_info {
     uint16_t port;
@@ -13,11 +15,13 @@ struct server_info {
     linked_list *history;
     pthread_t manager_t_id;
     pthread_mutex_t mutex;
+    void (*redraw_fun)(ui_list *list, linked_list *messages);
+    UI *ui;
 };
 
 typedef struct server_info server_info;
 
-server_info *startup(uint16_t port);
+server_info *startup(uint16_t port, void (*redraw_fun)(ui_list *list, linked_list *messages), UI *ui);
 
 void close_server(server_info *info);
 

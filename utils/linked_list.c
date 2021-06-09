@@ -1,7 +1,6 @@
 #include <stddef.h>
 #include <malloc.h>
 #include "linked_list.h"
-#include "message.h"
 
 void *get_element(linked_list *ptr, uint32_t index) {
     if (index >= ptr->size) {
@@ -15,19 +14,15 @@ void *get_element(linked_list *ptr, uint32_t index) {
 }
 
 uint32_t add_first(linked_list *ptr, void *element) {
-//    if (ptr->validation_fun(element)) {
     node *created = malloc(sizeof(node));
     created->next = ptr->first;
     created->value = element;
     ptr->first->prev = created;
     ptr->first = created;
     return 0;
-//    }
-    return -1;
 }
 
 uint32_t add_last(linked_list *ptr, void *element) {
-//    if (ptr->validation_fun(element)) {
     node *created = malloc(sizeof(node));
     created->prev = ptr->last;
     created->value = element;
@@ -39,13 +34,11 @@ uint32_t add_last(linked_list *ptr, void *element) {
         ptr->last = created;
     }
     return ++ptr->size;
-//    }
-    return -1;
 }
 
 linked_list *init_list() {
     linked_list *created = malloc(sizeof(linked_list));
-//    created->validation_fun = validation_fun;
+    created->size = 0;
     return created;
 }
 
@@ -92,7 +85,6 @@ uint16_t get_last_n(linked_list *ptr, void **buffer, uint16_t buffer_size) {
     node *current = ptr->last;
     for (uint16_t i = 0; i < buffer_size; ++i) {
         if(current == NULL) return i;
-        message*msg = current->value;
         buffer[i] = current->value;
         current = current->prev;
     }

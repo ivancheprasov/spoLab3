@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
     }
     sign_in(argv[2], server_fd);
     message *buffer[HISTORY_BUFFER_SIZE] = {0};
-    uint16_t history_size = get_history(buffer, HISTORY_BUFFER_SIZE, server_fd);
+    uint16_t history_size = get_history(buffer, server_fd);
     for (int i = history_size - 1; i >= 0; --i) {
         log_message(buffer[i]);
     }
@@ -66,7 +66,6 @@ int main(int argc, char **argv) {
         msg->from_size = strlen(argv[2]);
         msg->to_size = 0;
         msg->text_size = strlen(input);
-//        msg->time = time(NULL);
         uint16_t size = serialize(msg, to_send);
         send(server_fd, &size, sizeof(size), MSG_NOSIGNAL);
         send(server_fd, to_send, size, MSG_NOSIGNAL);

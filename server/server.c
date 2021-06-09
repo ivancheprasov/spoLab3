@@ -4,20 +4,20 @@
 #include <string.h>
 #include <pthread.h>
 #include <stdlib.h>
-#include <stdio.h>
 #include "server.h"
 
 struct accept_client_arg {
     server_info *server;
     client *client_info;
-
 };
 
-server_info *create_server_info(uint16_t port) {
+server_info *create_server_info(uint16_t port, void (*redraw_fun)(ui_list *list, linked_list *messages), UI *ui) {
     server_info *server = malloc(sizeof(server_info));
     server->port = port;
     server->clients = init_list();
     server->history = init_list();
+    server->redraw_fun = redraw_fun;
+    server->ui = ui;
     return server;
 }
 
@@ -33,8 +33,8 @@ void send_msg(client *found, message *msg) {
 void handle_request(message *ptr, server_info *server) {
     if (ptr->text_size != 0) {
         ptr->time = time(NULL);
-        log_message(ptr);
         add_last(server->history, ptr);
+        server->redraw_fun(server->ui->list, server->history);
         if (ptr->to_size == 0) {
             node *current = server->clients->first;
             while (current != NULL) {
@@ -94,16 +94,13 @@ _Noreturn void manage_connections(server_info *info) {
             struct accept_client_arg *arg = malloc(sizeof(struct accept_client_arg));
             arg->server = info;
             arg->client_info = created;
-            char log_buffer[USERNAME_SIZE + 11];
-            sprintf(log_buffer, "%s logged in\n", username);
-            write(1, log_buffer, strlen(log_buffer));
             pthread_create(&arg->client_info->thread, NULL, (void *(*)(void *)) accept_client, arg);
         }
     }
 }
 
-server_info *startup(uint16_t port) {
-    server_info *server_info_ptr = create_server_info(port);
+server_info *startup(uint16_t port, void (*redraw_fun)(ui_list *list, linked_list *messages), UI *ui) {
+    server_info *server_info_ptr = create_server_info(port, redraw_fun, ui);
     int created_socket = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in address;
     address.sin_addr.s_addr = htonl(INADDR_ANY);

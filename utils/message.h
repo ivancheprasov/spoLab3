@@ -21,4 +21,5 @@ uint16_t deserialize(message *to_fill, char src[MAX_MESSAGE_STRUCT_SIZE]);
 
 void log_message(message *message);
 
+message*to_message(void*value);
 #endif //SPOLAB3_MESSAGE_H
