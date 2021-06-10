@@ -70,7 +70,7 @@ client_ui *init_client_ui(char *username) {
     ui->is_msg_active = true;
     ui->history = create_list(ui->main);
     ui->to_field = create_textfield(USERNAME_SIZE, ui->to);
-    ui->msg_field = create_textfield(LINES - USERNAME_SIZE - 4, ui->msg);
+    ui->msg_field = create_textfield(getmaxx(ui->main_border) - USERNAME_SIZE - 4, ui->msg);
     return ui;
 }
 
@@ -146,15 +146,15 @@ int main(int argc, char **argv) {
                 }
                 break;
             case KEY_UP:
-                handle_down(ui->history, history);
-                break;
-            case KEY_DOWN:
                 handle_up(ui->history, history);
                 break;
-            case KEY_HOME:
+            case KEY_DOWN:
+                handle_down(ui->history, history);
+                break;
+            case KEY_F(2):
                 handle_home(ui->history, history);
                 break;
-            case KEY_END:
+            case KEY_F(3):
                 handle_end(ui->history, history);
                 break;
             case KEY_LEFT:
@@ -176,8 +176,6 @@ int main(int argc, char **argv) {
                 } else {
                     handle_backspace(ui->to_field);
                 }
-                break;
-            case KEY_F(2):
                 break;
             default:
                 if (ui->is_msg_active) {

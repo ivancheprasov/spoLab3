@@ -18,23 +18,25 @@ int main(int argc, char **argv) {
     server_info *info_ptr = startup(port, tracking_redraw, ui);
 
     if (info_ptr == NULL) {
+        endwin();
+        puts("Unable to startup");
         return -1;
     }
     int cur = getch();
-    while (cur != 'q') {
+    while (cur != KEY_F(1)) {
         char command[500] = {0};
         memset(command, 0, 500);
         switch (cur) {
             case KEY_UP:
-                handle_down(ui->list, info_ptr->history);
-                break;
-            case KEY_DOWN:
                 handle_up(ui->list, info_ptr->history);
                 break;
-            case KEY_HOME:
+            case KEY_DOWN:
+                handle_down(ui->list, info_ptr->history);
+                break;
+            case KEY_F(2):
                 handle_home(ui->list, info_ptr->history);
                 break;
-            case KEY_END:
+            case KEY_F(3):
                 handle_end(ui->list, info_ptr->history);
                 break;
         }

@@ -46,8 +46,10 @@ void handle_request(message *ptr, server_info *server) {
             if (receiver != NULL) {
                 send_msg(receiver, ptr);
             }
-            client *sender = find_element(by_username, server->clients, ptr->from);
-            send_msg(sender, ptr);
+            if(strcmp(ptr->to, ptr->from) != 0) {
+                client *sender = find_element(by_username, server->clients, ptr->from);
+                send_msg(sender, ptr);
+            }
         }
     }
 }
