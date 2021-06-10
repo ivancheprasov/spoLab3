@@ -3,6 +3,7 @@
 #include <malloc.h>
 #include <sys/socket.h>
 
+
 int8_t sign_in(char *client_name, int32_t server_fd) {
     char response;
     send(server_fd, client_name, strlen(client_name), MSG_NOSIGNAL);
@@ -32,5 +33,21 @@ void receive_message(message *msg, int32_t server_fd) {
 void free_client(client *ptr) {
     free(ptr->client_name);
     free(ptr);
+}
+
+_Noreturn void receive_notifications(arg *a) {
+    while (true) {
+        message *msg = malloc(sizeof(message));
+        receive_message(msg, a->server_fd);
+        add_last(a->history, msg);
+        a->redraw_fun(a->list, a->history);
+    }
+}
+
+void send_msg_to_server(int32_t server_fd, message *msg) {
+    char buf[MAX_MESSAGE_STRUCT_SIZE] = {0};
+    uint16_t size = serialize(msg, buf);
+    send(server_fd, &size, sizeof(size), MSG_NOSIGNAL);
+    send(server_fd, buf, size, MSG_NOSIGNAL);
 }
 

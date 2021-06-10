@@ -5,6 +5,7 @@
 #include <curses.h>
 #include "../utils/ui/textfield.h"
 #include "../utils/ui/ui_list.h"
+#include "../utils/message.h"
 
 typedef struct {
     bool is_msg_active;
@@ -19,8 +20,10 @@ typedef struct {
     ui_list *history;
 } client_ui;
 
-void toggle_active(client_ui *ui);
-
 client_ui *init_client_ui(char* username);
+
+void switch_active_textfield(client_ui *ui);
+
+void send_msg_to_server(int32_t server_fd, message *msg);
 
 #endif //SPOLAB3_UI_H

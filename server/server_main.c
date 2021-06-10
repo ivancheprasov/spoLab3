@@ -40,7 +40,6 @@ int main(int argc, char **argv) {
                 handle_end(ui->list, info_ptr->history);
                 break;
         }
-//        usleep(100000);
         cur = getch();
     }
     close_server(info_ptr);
